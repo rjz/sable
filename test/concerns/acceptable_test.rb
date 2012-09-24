@@ -20,15 +20,30 @@ class Sable::AcceptableTest < ActiveSupport::TestCase
     @acceptable = AcceptableKlass.new
   end
 
+  test 'defaults' do
+    assert_equal Sable::Acceptable::Pending, @acceptable.state
+  end
+
   test 'accept' do
     @acceptable.accept
     assert @acceptable.accept_called?
     assert @acceptable.accepted?
   end
-  
+ 
   test 'reject' do
     @acceptable.reject
     assert @acceptable.reject_called?
+    assert @acceptable.rejected?
+  end
+
+  test 'fail accept+reject unless pending' do
+    @acceptable.accept
+    @acceptable.reject
+    assert @acceptable.accepted?
+
+    @acceptable = AcceptableKlass.new
+    @acceptable.reject
+    @acceptable.accept
     assert @acceptable.rejected?
   end
 end

@@ -23,39 +23,43 @@ module Sable::Acceptable
   end
 
   included do 
-
     include ActiveRecord::Callbacks
     extend ClassExtensions
 
     define_callbacks :accept, :reject
 
-    instance_eval do
-      @acceptable_state ||= Sable::Acceptable::Pending
-    end
+    # Set default state
+    after_initialize Proc.new { |m| m.state ||= Sable::Acceptable::Pending }
+  end
+
+  def acceptable?
+    self.state == Sable::Acceptable::Pending
   end
 
   # Accept the current model
   def accept
+    return unless acceptable?
     run_callbacks :accept do
-      @acceptable_state = Sable::Acceptable::Accepted
+      self.state = Sable::Acceptable::Accepted
     end
   end
 
   # Has the current model been accepted?
   def accepted?
-    @acceptable_state == Sable::Acceptable::Accepted
+    self.state == Sable::Acceptable::Accepted
   end
 
   # Reject the current model
   def reject
+    return unless acceptable?
     run_callbacks :reject do
-      @acceptable_state = Sable::Acceptable::Rejected
+      self.state = Sable::Acceptable::Rejected
     end
   end
 
   # Has the current model been rejected?
   def rejected?
-    @acceptable_state == Sable::Acceptable::Rejected
+    self.state == Sable::Acceptable::Rejected
   end
 
 end

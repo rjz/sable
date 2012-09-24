@@ -26,7 +26,8 @@ end
 tb = TableBuilder.new
 
 tb.create_table 'acceptable_klasses', {
-  :id => :integer
+  :id => :integer,
+  :state => :integer
 }
 
 tb.create_table 'notifiable_klasses', {
