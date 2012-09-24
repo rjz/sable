@@ -1,0 +1,42 @@
+= Sable
+
+A collection of +ActiveSupport::Concern+ modules for kickstarting transactional Rails apps. Concerns currently include:
+
+* Sable::Acceptable
+* Sable::Notifiable
+* Sable::NotifiableRecipient
+* Sable::Subscribable
+* Sable::Subscriber
+
+_Sable remains under development_. Subsequent releases may or may not be back-compatible with this version.
+
+== Usage
+
+Include Sable concerns in any +ActiveRecord+:
+
+    class Zine < ActiveRecord::Base
+      include Sable::Subscribable
+      include Sable::Notifiable
+
+      has_one :owner
+
+      create_notifiable :new_subscriber,
+        :type => 'NewSubscriberNotification',
+        :recipients => :owner
+
+      after_subscribe :run_notifiable_new_subscriber
+    end
+
+== Todo
+
+Besides _everything_, Sable needs:
+
+* Gemfile updated with appropriate dependencies
+* An install generator
+* Model generators for base +Notification+ and +Subscription+ models
+* Test coverage for all generators
+* An augean cleansing
+
+=== License
+
+Sable is available under the MIT-LICENSE.
