@@ -62,5 +62,6 @@ module Sable::Acceptable
     self.state == Sable::Acceptable::Rejected
   end
 
+
 end
 

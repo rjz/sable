@@ -1,7 +1,9 @@
 require 'test_helper'
 
 # An extra notification class
-class NotificationToo < Notification; end
+class NotificationToo < Notification
+  set_table_name 'notifications'
+end
 
 # A notifiable class
 class NotifiableKlass < ActiveRecord::Base
@@ -13,7 +15,10 @@ class NotifiableKlass < ActiveRecord::Base
   after_initialize do 
     self.user = User.new
   end
+end
 
+class NotifiableChildKlass < NotifiableKlass 
+  set_table_name 'notifiable_klass'
 end
 
 class Sable::NotifiableTest < ActiveSupport::TestCase
@@ -33,7 +38,7 @@ class Sable::NotifiableTest < ActiveSupport::TestCase
 
   teardown do
     NotifiableKlass.class_eval do 
-      @notifiables = {}
+      self.notifiables = {}
       instance_methods.each do |meth|
         remove_method(meth) if meth =~ /^run_notifiable_/
       end
@@ -48,6 +53,17 @@ class Sable::NotifiableTest < ActiveSupport::TestCase
     assert_difference "@recipient.notifications.all.length" do
       @notifiable.send :run_notifiable_foobar
     end
+  end
+
+  test 'descendants inherit notifiables' do
+    NotifiableKlass.class_eval do
+      create_notifiable :foobar
+    end
+
+    notifiables = NotifiableChildKlass.notifiables
+
+    assert notifiables.is_a?(Hash)
+    assert notifiables.key?(:foobar)
   end
 
   test 'create' do

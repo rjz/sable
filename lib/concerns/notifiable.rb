@@ -5,11 +5,10 @@ module Sable::Notifiable
 
   module ClassExtensions
 
-    attr_reader :notifiables
-
     # Create a notifiable method
     def create_notifiable(chain_name, opts = {})
-      @notifiables ||= {}
+
+      notifiables = self.notifiables || {}
 
       # Determine whether a recipient is already associated with this class
       default_recipient = Sable.notifiable_recipient_class_name.underscore.to_sym
@@ -24,34 +23,38 @@ module Sable::Notifiable
       }
 
       notifiable = defaults.update(opts)
-      
+
       # Create a notifiable chain if it does not yet exist
-      unless @notifiables.key?(chain_name)
-        @notifiables[chain_name] = []
+      unless notifiables.key?(chain_name)
+        notifiables[chain_name] = []
         self.send(:define_method, :"run_notifiable_#{chain_name}") { process_notifiables(chain_name) }
       end
 
       # Don't add a notifiable twice!
-      return if @notifiables[chain_name].include?(notifiable)
+      return if notifiables[chain_name].include?(notifiable)
 
       # Add the notifiable to the chain
-      @notifiables[chain_name] << notifiable
+      notifiables[chain_name] << notifiable
+
+      # Assign updated notifiables back to the class
+      self.notifiables = notifiables
     end
 
   end
 
+  # Pump up the +Notifiable+ class
   included do
-  
-    self.class_eval do
-      extend ClassExtensions
-    end
+    
+    extend ClassExtensions
+
+    class_attribute :notifiables
 
     before_destroy :destroy_notifiables
   end
 
   # Callback: +before_destroy+, remove all related recommendations
   def destroy_notifiables
-    self.class.notifiables.values.flatten.each do |notifiable|
+    self.notifiables.values.flatten.each do |notifiable|
       model = resolve_notifiable_field(notifiable, :model) || self
 
       params = {
@@ -95,7 +98,7 @@ module Sable::Notifiable
       return if @notifiables_suppressed == true
 
       # Fire each notifiable in the named chain
-      self.class.notifiables[name].each do |notifiable|
+      self.notifiables[name].each do |notifiable|
 
         # Resolve the model
         model = resolve_notifiable_field(notifiable, :model) || self
