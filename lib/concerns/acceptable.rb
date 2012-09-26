@@ -32,6 +32,12 @@ module Sable::Acceptable
     after_initialize Proc.new { |m| m.state ||= Sable::Acceptable::Pending }
   end
 
+  # Whitelist acceptable methods
+  def acceptable_actions
+    ['accept', 'reject']
+  end
+
+  # Is the current model acceptable
   def acceptable?
     self.state == Sable::Acceptable::Pending
   end

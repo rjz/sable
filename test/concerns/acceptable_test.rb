@@ -24,6 +24,13 @@ class Sable::AcceptableTest < ActiveSupport::TestCase
     assert_equal Sable::Acceptable::Pending, @acceptable.state
   end
 
+  test 'acceptable actions' do
+    actions = ['accept','reject']
+    actions.each do |action|
+      assert @acceptable.acceptable_actions.include?(action)
+    end
+  end
+
   test 'accept' do
     @acceptable.accept
     assert @acceptable.accept_called?
