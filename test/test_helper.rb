@@ -35,11 +35,12 @@ tb.create_table 'notifiable_klasses', {
 }
 
 tb.create_table 'notifications', {
-  :id         => :integer,
-  :type       => :string,
-  :model_id   => :integer,
-  :model_type => :string,
-  :user_id    => :integer
+  :id             => :integer,
+  :type           => :string,
+  :model_id       => :integer,
+  :model_type     => :string,
+  :recipient_id   => :integer,
+  :recipient_type => :string
 }
 
 tb.create_table 'users', {
