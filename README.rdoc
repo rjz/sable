@@ -12,7 +12,16 @@ _Sable remains under development_. Subsequent releases may or may not be back-co
 
 == Usage
 
-Include Sable concerns in any +ActiveRecord+:
+Reference the gem via git:
+
+  # in Gemfile
+  gem 'sable', :git => 'https://github.com/rjz/sable.git'
+
+...and update
+
+  $ bundle install
+  
+Sable concerns are now available to the application's +ActiveRecord+s:
 
     class Zine < ActiveRecord::Base
       include Sable::Subscribable
@@ -27,10 +36,18 @@ Include Sable concerns in any +ActiveRecord+:
       after_subscribe :run_notifiable_new_subscriber
     end
 
+    # Subscribe a user to the zine
+    zine = Zine.find_by_title('My Zine')
+    current_user.subscribe(zine)
+
+    puts user.subscribed?(zine) # true
+    puts user.notifications.last # NewSubscriberNotification
+
 == Todo
 
 Besides _everything_, Sable needs:
 
+* Real usage examples
 * Gemfile updated with appropriate dependencies
 * An install generator
 * Model generators for base +Notification+ and +Subscription+ models
