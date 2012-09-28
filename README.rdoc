@@ -12,15 +12,26 @@ _Sable remains under development_. Subsequent releases may or may not be back-co
 
 == Usage
 
-Reference the gem via git:
+As +sable+ continues to evolve, the safest usage is as a submodule that can be updated (or reverted) as needed.
+
+  $ git submodule add https://github.com/rjz/sable.git lib/sable
+
+Update the gem file with the new submodule:
+
+  # in Gemfile
+  gem 'sable', :path => 'lib/sable'
+
+And install:
+
+  $ bundle install
+
+Feeling bold? add the gem directly via git:
 
   # in Gemfile
   gem 'sable', :git => 'https://github.com/rjz/sable.git'
 
-...and update
+=== Using Sable Concerns
 
-  $ bundle install
-  
 Sable concerns are now available to the application's +ActiveRecord+s:
 
     class Zine < ActiveRecord::Base
@@ -34,6 +45,11 @@ Sable concerns are now available to the application's +ActiveRecord+s:
         :recipients => :owner
 
       after_subscribe :run_notifiable_new_subscriber
+    end
+
+    class User < ActiveRecord::Base
+      include Sable::Subscriber
+      include Sable::NotifiableRecipient
     end
 
     # Subscribe a user to the zine
